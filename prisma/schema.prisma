@@ -1,0 +1,32 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ReservationStatus {
+  PENDING
+  APPROVED
+}
+
+model Equipment {
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
+  available    Int
+  reservations Reservation[]
+}
+
+model Reservation {
+  id          Int               @id @default(autoincrement())
+  requester   String
+  equipmentId Int
+  equipment   Equipment         @relation(fields: [equipmentId], references: [id], onDelete: Restrict)
+  status      ReservationStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
+
+  @@index([equipmentId])
+}
